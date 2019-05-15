@@ -142,6 +142,9 @@ def linear_activation_forward(A_prev, W, b, activation):
     elif activation == "tanh":
         Z, linear_cache = linear_forward(A_prev, W, b)
         A, activation_cache = tanh(Z)
+    else:  # no activation
+        A, linear_cache = linear_forward(A_prev, W, b)
+        activation_cache = A
 
     assert (A.shape == (W.shape[0], A_prev.shape[1]))
     cache = (linear_cache, activation_cache)
@@ -158,7 +161,7 @@ def linear_activation_forward(A_prev, W, b, activation):
 # print("With ReLU: A = " + str(A))
 
 
-def L_model_forward(X, parameters, activationL="tanh"):
+def L_model_forward(X, parameters, activationL="sigmoid"):
     """
     Implement forward propagation for the [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID computation
 
@@ -242,8 +245,8 @@ def linear_backward(dZ, cache):
     A_prev, W, b = cache
     m = A_prev.shape[1]
 
-    dW = 1 / m * np.dot(dZ, A_prev.T)
-    db = 1 / m * np.sum(dZ, axis=1).reshape(b.shape)
+    dW = 1. / m * np.dot(dZ, A_prev.T)
+    db = 1. / m * np.sum(dZ, axis=1, keepdims=True)
 
     dA_prev = np.dot(W.T, dZ)
 
@@ -308,7 +311,7 @@ def linear_activation_backward(dA, cache, activation):
 # print("db = " + str(db))
 
 
-def L_model_backward(AL, Y, caches, activationL="tanh"):
+def L_model_backward(AL, Y, caches, activationL="sigmoid"):
     """
     Implement the backward propagation for the [LINEAR->RELU] * (L-1) -> LINEAR -> SIGMOID group
 
@@ -379,16 +382,16 @@ def update_parameters(parameters, grads, learning_rate):
     return parameters
 
 
-parameters, grads = update_parameters_test_case()
-parameters = update_parameters(parameters, grads, 0.1)
+# parameters, grads = update_parameters_test_case()
+# parameters = update_parameters(parameters, grads, 0.1)
+#
+# print("W1 = " + str(parameters["W1"]))
+# print("b1 = " + str(parameters["b1"]))
+# print("W2 = " + str(parameters["W2"]))
+# print("b2 = " + str(parameters["b2"]))
 
-print("W1 = " + str(parameters["W1"]))
-print("b1 = " + str(parameters["b1"]))
-print("W2 = " + str(parameters["W2"]))
-print("b2 = " + str(parameters["b2"]))
 
-
-def predict(X, y, parameters):
+def predict(X, y, parameters ):
     """
     This function is used to predict the results of a  L-layer neural network.
 
@@ -420,3 +423,14 @@ def predict(X, y, parameters):
     print("Accuracy: " + str(np.sum((p == y) / m)))
 
     return p
+
+
+def predict_reg(X, y, parameters):
+    m = X.shape[1]
+    n = len(parameters) // 2  # number of layers in the neural network
+    p = np.zeros((1, m))
+
+    # Forward propagation
+    probas, caches = L_model_forward(X, parameters)
+    # print("cost "+compute_cost(probas,Y))
+    return probas

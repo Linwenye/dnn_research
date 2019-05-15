@@ -95,7 +95,8 @@ def two_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000
     return parameters
 
 
-def L_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, print_cost=False):  # lr was 0.009
+def L_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, print_cost=False,
+                  dtype="float64", activationL="sigmoid"):  # lr was 0.009
     """
     Implements a L-layer neural network: [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID.
 
@@ -121,13 +122,13 @@ def L_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, 
     for i in range(0, num_iterations):
 
         # Forward propagation: [LINEAR -> RELU]*(L-1) -> LINEAR -> SIGMOID.
-        AL, caches = L_model_forward(X, parameters)
+        AL, caches = L_model_forward(X, parameters,activationL=activationL)
 
         # Compute cost.
         cost = compute_cost(AL, Y)
 
         # Backward propagation.
-        grads = L_model_backward(AL, Y, caches)
+        grads = L_model_backward(AL, Y, caches,activationL=activationL)
 
         # Update parameters.
         parameters = update_parameters(parameters, grads, learning_rate)
@@ -135,7 +136,6 @@ def L_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, 
         # Print the cost every 100 training example
         if print_cost and i % 100 == 0:
             print("Cost after iteration %i: %f" % (i, cost))
-        if print_cost and i % 100 == 0:
             costs.append(cost)
 
     # plot the cost
@@ -146,5 +146,3 @@ def L_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, 
     plt.show()
 
     return parameters
-
-
