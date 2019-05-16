@@ -37,7 +37,7 @@ def two_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000
     (n_x, n_h, n_y) = layers_dims
 
     # Initialize parameters dictionary, by calling one of the functions you'd previously implemented
-    parameters = initialize_parameters_deep(layers_dims)
+    parameters = initialize_parameters(n_x,n_h,n_y)
 
     # Get W1, b1, W2 and b2 from the dictionary parameters.
     W1 = parameters["W1"]

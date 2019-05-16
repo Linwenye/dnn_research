@@ -56,6 +56,6 @@ n_y = 1
 
 ### CONSTANTS ###
 layers_dims = [12288, 20, 7, 5, 1]  # 4-layer model
-parameters = L_layer_model(train_x, train_y, layers_dims, num_iterations=2500, print_cost=True)
+parameters = L_layer_model(train_x, train_y, layers_dims, num_iterations=2500, print_cost=True, activationL="sigmoid")
 pred_train = predict(train_x, train_y, parameters)
 pred_test = predict(test_x, test_y, parameters)
