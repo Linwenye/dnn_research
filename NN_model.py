@@ -129,7 +129,7 @@ def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_
         cost = compute_cost(AL, Y, cost_type)
 
         # Backward propagation.
-        grads = L_model_backward(AL, Y, caches, activation_list=activation_list)
+        grads = L_model_backward(AL, Y, caches, activation_list=activation_list, cost_type=cost_type)
 
         # Update parameters.
         parameters = update_parameters(parameters, grads, learning_rate)
