@@ -97,7 +97,7 @@ def two_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000
 
 
 def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_iterations=3000, print_cost=False,
-                  dtype="float64", cost_type="cross-entropy"):  # lr was 0.009
+                  cost_type="cross-entropy"):  # lr was 0.009
     """
     Implements a L-layer neural network: [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID.
 

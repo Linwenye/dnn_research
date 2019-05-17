@@ -11,6 +11,7 @@ plt.rcParams['image.interpolation'] = 'nearest'
 plt.rcParams['image.cmap'] = 'gray'
 np.random.seed(1)
 
+dtype = "float64"
 
 def initialize_parameters(n_x, n_h, n_y):
     """
