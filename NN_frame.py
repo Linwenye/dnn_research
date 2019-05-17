@@ -2,7 +2,7 @@ import numpy as np
 import h5py
 import matplotlib.pyplot as plt
 from testcase.testCases_v3 import *
-from utils.dnn_utils_v2 import *
+from utils.activation_function import *
 import decimal
 
 # pre setting
@@ -162,14 +162,14 @@ def linear_activation_forward(A_prev, W, b, activation):
 # print("With ReLU: A = " + str(A))
 
 
-def L_model_forward(X, parameters, activationL="sigmoid"):
+def L_model_forward(X, parameters, activation_list):
     """
     Implement forward propagation for the [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID computation
 
     Arguments:
     X -- data, numpy array of shape (input size, number of examples)
     parameters -- output of initialize_parameters_deep()
-    activationL -- last layer activation
+    activation_list -- layer activation
     Returns:
     AL -- last post-activation value
     caches -- list of caches containing:
@@ -184,11 +184,12 @@ def L_model_forward(X, parameters, activationL="sigmoid"):
     # Implement [LINEAR -> RELU]*(L-1). Add "cache" to the "caches" list.
     for l in range(1, L):
         A_prev = A
-        A, cache = linear_activation_forward(A_prev, parameters['W' + str(l)], parameters['b' + str(l)], "relu")
+        A, cache = linear_activation_forward(A_prev, parameters['W' + str(l)], parameters['b' + str(l)],
+                                             activation_list[l - 1])
         caches.append(cache)
 
     # Implement LINEAR -> SIGMOID. Add "cache" to the "caches" list.
-    AL, cache = linear_activation_forward(A, parameters['W' + str(L)], parameters['b' + str(L)], "sigmoid")
+    AL, cache = linear_activation_forward(A, parameters['W' + str(L)], parameters['b' + str(L)], activation_list[L - 1])
     caches.append(cache)
 
     assert (AL.shape == (1, X.shape[1]))
@@ -202,9 +203,9 @@ def L_model_forward(X, parameters, activationL="sigmoid"):
 # print("Length of caches list = " + str(len(caches)))
 
 
-def compute_cost(AL, Y):
+def compute_cost(AL, Y, cost_type="cross-entropy"):
     """
-    Implement the cost function defined by equation (7).
+    Implement the cost function defined by equation).
 
     Arguments:
     AL -- probability vector corresponding to your label predictions, shape (1, number of examples)
@@ -218,7 +219,12 @@ def compute_cost(AL, Y):
 
     # Compute loss from aL and y.
     # log use e as base
-    cost = (-1 / m) * np.sum(np.multiply(Y, np.log(AL)) + np.multiply(1 - Y, np.log(1 - AL)))
+    if (cost_type == "cross-entropy"):
+        cost = (-1 / m) * np.sum(np.multiply(Y, np.log(AL)) + np.multiply(1 - Y, np.log(1 - AL)))
+    elif (cost_type == "MAE"):
+        cost = np.sum(np.abs(AL - Y)) / m
+    elif (cost_type == "MSE"):
+        cost = np.sum(np.square(AL - Y)) / (2 * m)
     cost = np.squeeze(cost)  # To make sure your cost's shape is what we expect (e.g. this turns [[17]] into 17).
     assert (cost.shape == ())
 
@@ -309,7 +315,7 @@ def linear_activation_backward(dA, cache, activation):
 # print("db = " + str(db))
 
 
-def L_model_backward(AL, Y, caches, activationL="sigmoid"):
+def L_model_backward(AL, Y, caches, activation_list, cost_type="cross-entropy"):
     """
     Implement the backward propagation for the [LINEAR->RELU] * (L-1) -> LINEAR -> SIGMOID group
 
@@ -319,7 +325,7 @@ def L_model_backward(AL, Y, caches, activationL="sigmoid"):
     caches -- list of caches containing:
                 every cache of linear_activation_forward() with "relu" (it's caches[l], for l in range(L-1) i.e l = 0...L-2)
                 the cache of linear_activation_forward() with "sigmoid" (it's caches[L-1])
-    activationL -- last layer activation function "sigmoid" "tanh"
+    activation_list -- layer activation function "sigmoid" "tanh" "linear"
     Returns:
     grads -- A dictionary with the gradients
              grads["dA" + str(l)] = ...
@@ -332,17 +338,21 @@ def L_model_backward(AL, Y, caches, activationL="sigmoid"):
     Y = Y.reshape(AL.shape)  # after this line, Y is the same shape as AL
 
     # Initializing the backpropagation
-    dAL = - (np.divide(Y, AL) - np.divide(1 - Y, 1 - AL))
-
+    if cost_type == "cross-entropy":
+        dAL = - (np.divide(Y, AL) - np.divide(1 - Y, 1 - AL))
+    elif cost_type == "MSE":
+        dAL = AL - Y
     current_cache = caches[- 1]
     grads["dA" + str(L - 1)], grads["dW" + str(L)], grads["db" + str(L)] = linear_activation_backward(dAL,
                                                                                                       current_cache,
-                                                                                                      "sigmoid")
+                                                                                                      activation_list[
+                                                                                                          L - 1])
 
     for l in reversed(range(L - 1)):
         # lth layer: (RELU -> LINEAR) gradients.
         current_cache = caches[l]
-        dA_prev_temp, dW_temp, db_temp = linear_activation_backward(grads["dA" + str(l + 1)], current_cache, "relu")
+        dA_prev_temp, dW_temp, db_temp = linear_activation_backward(grads["dA" + str(l + 1)], current_cache,
+                                                                    activation_list[l])
         grads["dA" + str(l)] = dA_prev_temp
         grads["dW" + str(l + 1)] = dW_temp
         grads["db" + str(l + 1)] = db_temp
@@ -389,7 +399,7 @@ def update_parameters(parameters, grads, learning_rate):
 # print("b2 = " + str(parameters["b2"]))
 
 
-def predict(X, y, parameters):
+def predict(X, y, parameters, activation_list):
     """
     This function is used to predict the results of a  L-layer neural network.
 
@@ -406,7 +416,7 @@ def predict(X, y, parameters):
     p = np.zeros((1, m))
 
     # Forward propagation
-    probas, caches = L_model_forward(X, parameters)
+    probas, caches = L_model_forward(X, parameters, activation_list)
 
     # convert probas to 0/1 predictions
     for i in range(0, probas.shape[1]):
@@ -421,14 +431,3 @@ def predict(X, y, parameters):
     print("Accuracy: " + str(np.sum((p == y) / m)))
 
     return p
-
-
-def predict_reg(X, y, parameters):
-    m = X.shape[1]
-    n = len(parameters) // 2  # number of layers in the neural network
-    p = np.zeros((1, m))
-
-    # Forward propagation
-    probas, caches = L_model_forward(X, parameters)
-    # print("cost "+compute_cost(probas,Y))
-    return probas

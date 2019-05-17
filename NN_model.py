@@ -14,7 +14,8 @@ plt.rcParams['image.cmap'] = 'gray'
 np.random.seed(1)
 
 
-def two_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, print_cost=False, activationL="tanh"):
+def two_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, print_cost=False,
+                    activation_list="tanh"):
     """
     Implements a two-layer neural network: LINEAR->RELU->LINEAR->SIGMOID.
 
@@ -37,7 +38,7 @@ def two_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000
     (n_x, n_h, n_y) = layers_dims
 
     # Initialize parameters dictionary, by calling one of the functions you'd previously implemented
-    parameters = initialize_parameters(n_x,n_h,n_y)
+    parameters = initialize_parameters(n_x, n_h, n_y)
 
     # Get W1, b1, W2 and b2 from the dictionary parameters.
     W1 = parameters["W1"]
@@ -51,7 +52,7 @@ def two_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000
 
         # Forward propagation: LINEAR -> RELU -> LINEAR -> SIGMOID. Inputs: "X, W1, b1". Output: "A1, cache1, A2, cache2".
         A1, cache1 = linear_activation_forward(X, W1, b1, "relu")
-        A2, cache2 = linear_activation_forward(A1, W2, b2, activationL)
+        A2, cache2 = linear_activation_forward(A1, W2, b2, activation_list)
 
         # Compute cost
         cost = compute_cost(A2, Y)
@@ -60,7 +61,7 @@ def two_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000
         dA2 = - (np.divide(Y, A2) - np.divide(1 - Y, 1 - A2))
 
         # Backward propagation. Inputs: "dA2, cache2, cache1". Outputs: "dA1, dW2, db2; also dA0 (not used), dW1, db1".
-        dA1, dW2, db2 = linear_activation_backward(dA2, cache2, activationL)
+        dA1, dW2, db2 = linear_activation_backward(dA2, cache2, activation_list)
         dA0, dW1, db1 = linear_activation_backward(dA1, cache1, "relu")
 
         # Set grads['dWl'] to dW1, grads['db1'] to db1, grads['dW2'] to dW2, grads['db2'] to db2
@@ -95,13 +96,13 @@ def two_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000
     return parameters
 
 
-def L_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, print_cost=False,
-                  dtype="float64", activationL="sigmoid"):  # lr was 0.009
+def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_iterations=3000, print_cost=False,
+                  dtype="float64", cost_type="cross-entropy"):  # lr was 0.009
     """
     Implements a L-layer neural network: [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID.
 
     Arguments:
-    X -- data, numpy array of shape (number of examples, num_px * num_px * 3)
+    X -- data, numpy array of shape (size,number of examples)
     Y -- true "label" vector (containing 0 if cat, 1 if non-cat), of shape (1, number of examples)
     layers_dims -- list containing the input size and each layer size, of length (number of layers + 1).
     learning_rate -- learning rate of the gradient descent update rule
@@ -122,13 +123,13 @@ def L_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, 
     for i in range(0, num_iterations):
 
         # Forward propagation: [LINEAR -> RELU]*(L-1) -> LINEAR -> SIGMOID.
-        AL, caches = L_model_forward(X, parameters,activationL=activationL)
+        AL, caches = L_model_forward(X, parameters, activation_list=activation_list)
 
         # Compute cost.
-        cost = compute_cost(AL, Y)
+        cost = compute_cost(AL, Y, cost_type)
 
         # Backward propagation.
-        grads = L_model_backward(AL, Y, caches,activationL=activationL)
+        grads = L_model_backward(AL, Y, caches, activation_list=activation_list)
 
         # Update parameters.
         parameters = update_parameters(parameters, grads, learning_rate)
