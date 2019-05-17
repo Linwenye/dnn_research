@@ -399,7 +399,7 @@ def update_parameters(parameters, grads, learning_rate):
 # print("b2 = " + str(parameters["b2"]))
 
 
-def predict(X, y, parameters, activation_list):
+def predict(X, y, parameters, activation_list, to_plot=False):
     """
     This function is used to predict the results of a  L-layer neural network.
 
@@ -418,16 +418,20 @@ def predict(X, y, parameters, activation_list):
     # Forward propagation
     probas, caches = L_model_forward(X, parameters, activation_list)
 
-    # convert probas to 0/1 predictions
-    for i in range(0, probas.shape[1]):
-        if probas[0, i] > 0.5:
-            p[0, i] = 1
-        else:
-            p[0, i] = 0
+    if not to_plot:
+        # convert probas to 0/1 predictions
+        for i in range(0, probas.shape[1]):
+            if probas[0, i] > 0.5:
+                p[0, i] = 1
+            else:
+                p[0, i] = 0
 
-    # print results
-    # print ("predictions: " + str(p))
-    # print ("true labels: " + str(y))
-    print("Accuracy: " + str(np.sum((p == y) / m)))
+        # print results
+        # print ("predictions: " + str(p))
+        # print ("true labels: " + str(y))
+        print("Accuracy: " + str(np.sum((p == y) / m)))
 
+    else:
+        plt.scatter(X, probas.reshape(X.shape))
+        plt.show()
     return p

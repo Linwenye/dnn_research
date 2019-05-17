@@ -1,7 +1,7 @@
 from NN_model import *
 import numpy as np
 
-X = np.linspace(-1, 1, 200)
+X = np.linspace(1, 3, 200)
 np.random.shuffle(X)  # randomize the data
 
 Y = 2 * X + 2
@@ -21,9 +21,9 @@ Y_test = Y_test.reshape(1, 40)
 
 print(str(X_train.shape))
 layers_dims = [1, 1, 1]  # 2-layer model
-
-parameters = L_layer_model(X_train, Y_train, layers_dims, activation_list=["relu", "linear"], num_iterations=2500,
+activation_list = ["relu", "linear"]
+parameters = L_layer_model(X_train, Y_train, layers_dims, activation_list=activation_list, num_iterations=2500,
                            print_cost=True,
                            cost_type="MSE")
-# pred_train = predict(X_train, Y_train, parameters)
-# pred_test = predict(X_test, Y_test, parameters)
+# pred_train = predict(X_train, Y_train, parameters, activation_list=activation_list)
+pred_test = predict(X_test, Y_test, parameters, activation_list=activation_list, to_plot=True)
