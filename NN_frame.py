@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from testcase.testCases_v3 import *
 from utils.activation_function import *
 import decimal
+from numpy_decimal import *
 
 # pre setting
 plt.rcParams['figure.figsize'] = (5.0, 4.0)  # set default size of plots
@@ -11,7 +12,6 @@ plt.rcParams['image.interpolation'] = 'nearest'
 plt.rcParams['image.cmap'] = 'gray'
 np.random.seed(1)
 
-dtype = "float64"
 
 def initialize_parameters(n_x, n_h, n_y):
     """
@@ -55,7 +55,7 @@ def initialize_parameters(n_x, n_h, n_y):
 # print("b2 = " + str(parameters["b2"]))
 
 
-def initialize_parameters_deep(layer_dims):
+def initialize_parameters_deep(layer_dims, dtype):
     """
     Arguments:
     layer_dims -- python array (list) containing the dimensions of each layer in our network
@@ -70,14 +70,30 @@ def initialize_parameters_deep(layer_dims):
     parameters = {}
     L = len(layer_dims)  # number of layers in the network
 
-    for l in range(1, L):
-        parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l - 1]) / np.sqrt(
-            layer_dims[l - 1])  # *0.01
-        parameters['b' + str(l)] = np.zeros((layer_dims[l], 1))
+    if dtype == "decimal":
+        for l in range(1, L):
+            parameters['W' + str(l)] = to_decimal(np.random.randn(layer_dims[l], layer_dims[l - 1]) / np.sqrt(
+                layer_dims[l - 1]))  # *0.01
 
-        assert (parameters['W' + str(l)].shape == (layer_dims[l], layer_dims[l - 1]))
-        assert (parameters['b' + str(l)].shape == (layer_dims[l], 1))
+            parameters['b' + str(l)] = to_decimal(np.zeros((layer_dims[l], 1)))
+            assert (parameters['W' + str(l)].shape == (layer_dims[l], layer_dims[l - 1]))
+            assert (parameters['b' + str(l)].shape == (layer_dims[l], 1))
+    elif dtype == "mpmath":
+        for l in range(1, L):
+            parameters['W' + str(l)] = to_mp(np.random.randn(layer_dims[l], layer_dims[l - 1]) / np.sqrt(
+                layer_dims[l - 1]))  # *0.01
 
+            parameters['b' + str(l)] = to_mp(np.zeros((layer_dims[l], 1)))
+            assert (parameters['W' + str(l)].shape == (layer_dims[l], layer_dims[l - 1]))
+            assert (parameters['b' + str(l)].shape == (layer_dims[l], 1))
+    else:
+        for l in range(1, L):
+            parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l - 1]) / np.sqrt(
+                layer_dims[l - 1])  # *0.01
+
+            parameters['b' + str(l)] = np.zeros((layer_dims[l], 1))
+            assert (parameters['W' + str(l)].shape == (layer_dims[l], layer_dims[l - 1]))
+            assert (parameters['b' + str(l)].shape == (layer_dims[l], 1))
     return parameters
 
 
@@ -273,7 +289,7 @@ def linear_backward(dZ, cache):
 # print("db = " + str(db))
 
 
-def linear_activation_backward(dA, cache, activation):
+def linear_activation_backward(dA, cache, activation, dtype):
     """
     Implement the backward propagation for the LINEAR->ACTIVATION layer.
 
@@ -290,7 +306,7 @@ def linear_activation_backward(dA, cache, activation):
     linear_cache, activation_cache = cache
 
     if activation == "relu":
-        dZ = relu_backward(dA, cache[1])
+        dZ = relu_backward(dA, cache[1],dtype)
     elif activation == "sigmoid":
         dZ = sigmoid_backward(dA, cache[1])
     elif activation == "tanh":
@@ -316,7 +332,7 @@ def linear_activation_backward(dA, cache, activation):
 # print("db = " + str(db))
 
 
-def L_model_backward(AL, Y, caches, activation_list, cost_type="cross-entropy"):
+def L_model_backward(AL, Y, caches, activation_list, cost_type="cross-entropy", dtype="float"):
     """
     Implement the backward propagation for the [LINEAR->RELU] * (L-1) -> LINEAR -> SIGMOID group
 
@@ -347,13 +363,13 @@ def L_model_backward(AL, Y, caches, activation_list, cost_type="cross-entropy"):
     grads["dA" + str(L - 1)], grads["dW" + str(L)], grads["db" + str(L)] = linear_activation_backward(dAL,
                                                                                                       current_cache,
                                                                                                       activation_list[
-                                                                                                          L - 1])
+                                                                                                          L - 1], dtype)
 
     for l in reversed(range(L - 1)):
         # lth layer: (RELU -> LINEAR) gradients.
         current_cache = caches[l]
         dA_prev_temp, dW_temp, db_temp = linear_activation_backward(grads["dA" + str(l + 1)], current_cache,
-                                                                    activation_list[l])
+                                                                    activation_list[l],dtype)
         grads["dA" + str(l)] = dA_prev_temp
         grads["dW" + str(l + 1)] = dW_temp
         grads["db" + str(l + 1)] = db_temp

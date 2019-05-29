@@ -1,4 +1,5 @@
 import numpy as np
+from decimal import Decimal
 
 
 def sigmoid(Z):
@@ -58,7 +59,7 @@ def tanh(Z):
     return A, cache
 
 
-def relu_backward(dA, cache):
+def relu_backward(dA, cache, dtype):
     """
     Implement the backward propagation for a single RELU unit.
 
@@ -73,9 +74,11 @@ def relu_backward(dA, cache):
     Z = cache
     dZ = np.array(dA, copy=True)  # just converting dz to a correct object.
 
-    # When z <= 0, you should set dz to 0 as well. 
-    dZ[Z <= 0] = 0
-
+    # When z <= 0, you should set dz to 0 as well.
+    if dtype == 'decimal':
+        dZ[Z <= 0] = Decimal('0.0')
+    else:
+        dZ[Z <= 0] = 0
     assert (dZ.shape == Z.shape)
 
     return dZ

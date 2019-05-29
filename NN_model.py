@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import scipy
 from PIL import Image
 from scipy import ndimage
+from numpy_decimal import *
 
 plt.rcParams['figure.figsize'] = (5.0, 4.0)  # set default size of plots
 plt.rcParams['image.interpolation'] = 'nearest'
@@ -97,7 +98,7 @@ def two_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000
 
 
 def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_iterations=3000, print_cost=False,
-                  cost_type="cross-entropy"):  # lr was 0.009
+                  cost_type="cross-entropy", dtype="float", precision=53):  # lr was 0.009
     """
     Implements a L-layer neural network: [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID.
 
@@ -116,8 +117,15 @@ def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_
     np.random.seed(1)
     costs = []  # keep track of cost
 
+    # set precision
+    if dtype == "decimal":
+        set_decimal_precision(precision)
+        learning_rate = Decimal(learning_rate)
+    elif dtype == "mpmath":
+        set_mp_precision(precision)
+
     # Parameters initialization.
-    parameters = initialize_parameters_deep(layers_dims)
+    parameters = initialize_parameters_deep(layers_dims, dtype)
 
     # Loop (gradient descent)
     for i in range(0, num_iterations):
@@ -129,9 +137,10 @@ def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_
         cost = compute_cost(AL, Y, cost_type)
 
         # Backward propagation.
-        grads = L_model_backward(AL, Y, caches, activation_list=activation_list, cost_type=cost_type)
+        grads = L_model_backward(AL, Y, caches, activation_list=activation_list, cost_type=cost_type, dtype=dtype)
 
         # Update parameters.
+
         parameters = update_parameters(parameters, grads, learning_rate)
 
         # Print the cost every 100 training example

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import scipy
 from PIL import Image
 from scipy import ndimage
-from utils.dnn_app_utils_v2 import load_data, print_mislabeled_images
+from utils.dnn_app_utils import load_data, print_mislabeled_images
 from NN_model import *
 
 plt.rcParams['figure.figsize'] = (5.0, 4.0)  # set default size of plots
@@ -61,3 +61,5 @@ parameters = L_layer_model(train_x, train_y, layers_dims, num_iterations=2500, p
                            activation_list=activation_list)
 pred_train = predict(train_x, train_y, parameters, activation_list=activation_list)
 pred_test = predict(test_x, test_y, parameters, activation_list=activation_list)
+
+

@@ -22,7 +22,7 @@ Y = 2 * X + 2
 
 # plot data
 plt.scatter(X, Y)
-plt.show()
+# plt.show()
 
 # train test split
 X_train, Y_train = X[:160], Y[:160]
@@ -52,4 +52,4 @@ Y_pred = Y_pred.flatten()
 
 plt.scatter(X_test, Y_test)
 plt.plot(X_test, Y_pred)
-plt.show()
+# plt.show()
