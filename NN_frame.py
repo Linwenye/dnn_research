@@ -306,7 +306,7 @@ def linear_activation_backward(dA, cache, activation, dtype):
     linear_cache, activation_cache = cache
 
     if activation == "relu":
-        dZ = relu_backward(dA, cache[1],dtype)
+        dZ = relu_backward(dA, cache[1], dtype)
     elif activation == "sigmoid":
         dZ = sigmoid_backward(dA, cache[1])
     elif activation == "tanh":
@@ -369,7 +369,7 @@ def L_model_backward(AL, Y, caches, activation_list, cost_type="cross-entropy", 
         # lth layer: (RELU -> LINEAR) gradients.
         current_cache = caches[l]
         dA_prev_temp, dW_temp, db_temp = linear_activation_backward(grads["dA" + str(l + 1)], current_cache,
-                                                                    activation_list[l],dtype)
+                                                                    activation_list[l], dtype)
         grads["dA" + str(l)] = dA_prev_temp
         grads["dW" + str(l + 1)] = dW_temp
         grads["db" + str(l + 1)] = db_temp
@@ -416,7 +416,7 @@ def update_parameters(parameters, grads, learning_rate):
 # print("b2 = " + str(parameters["b2"]))
 
 
-def predict(X, y, parameters, activation_list, to_plot=False):
+def predict(X, y, parameters, activation_list, not_convert=False):
     """
     This function is used to predict the results of a  L-layer neural network.
 
@@ -435,20 +435,18 @@ def predict(X, y, parameters, activation_list, to_plot=False):
     # Forward propagation
     probas, caches = L_model_forward(X, parameters, activation_list)
 
-    if not to_plot:
+    if not not_convert:
         # convert probas to 0/1 predictions
         for i in range(0, probas.shape[1]):
             if probas[0, i] > 0.5:
                 p[0, i] = 1
             else:
                 p[0, i] = 0
-
+        print("Accuracy: ?" + str(np.sum((p == y) / m)))
         # print results
         # print ("predictions: " + str(p))
         # print ("true labels: " + str(y))
-        print("Accuracy: " + str(np.sum((p == y) / m)))
+        return p
 
     else:
-        plt.scatter(X, probas.reshape(X.shape))
-        plt.show()
-    return p
+        return probas

@@ -7,6 +7,7 @@ import scipy
 from PIL import Image
 from scipy import ndimage
 from numpy_decimal import *
+from pprint import pprint
 
 plt.rcParams['figure.figsize'] = (5.0, 4.0)  # set default size of plots
 plt.rcParams['image.interpolation'] = 'nearest'
@@ -97,7 +98,7 @@ def two_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000
     return parameters
 
 
-def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_iterations=3000, print_cost=False,
+def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_iterations=3000, print_ctrl=None,
                   cost_type="cross-entropy", dtype="float", precision=53):  # lr was 0.009
     """
     Implements a L-layer neural network: [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID.
@@ -144,15 +145,19 @@ def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_
         parameters = update_parameters(parameters, grads, learning_rate)
 
         # Print the cost every 100 training example
-        if print_cost and i % 100 == 0:
+        if print_ctrl["print_cost"] and i % print_ctrl["iterations"] == 0:
             print("Cost after iteration %i: %f" % (i, cost))
             costs.append(cost)
 
+        if print_ctrl["print_parameter"] and i % print_ctrl["iterations"] == 0:
+            print("Iterations ", i)
+            pprint(parameters)
+            print()
     # plot the cost
-    plt.plot(np.squeeze(costs))
-    plt.ylabel('cost')
-    plt.xlabel('iterations (per tens)')
-    plt.title("Learning rate =" + str(learning_rate))
-    plt.show()
+    # plt.plot(np.squeeze(costs))
+    # plt.ylabel('cost')
+    # plt.xlabel('iterations (per tens)')
+    # plt.title("Learning rate =" + str(learning_rate))
+    # plt.show()
 
     return parameters
