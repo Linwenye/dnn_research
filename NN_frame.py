@@ -442,7 +442,7 @@ def predict(X, y, parameters, activation_list, not_convert=False):
                 p[0, i] = 1
             else:
                 p[0, i] = 0
-        print("Accuracy: ?" + str(np.sum((p == y) / m)))
+        print("Accuracy: " + str(np.sum((p == y) / m)))
         # print results
         # print ("predictions: " + str(p))
         # print ("true labels: " + str(y))

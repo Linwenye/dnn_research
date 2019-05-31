@@ -11,8 +11,8 @@ def record_time():
 
 def plot_time():
     plt.plot(time_records)
-    plt.ylabel('time')
-    plt.xlabel('iterations')
+    plt.ylabel('time(s)')
+    plt.xlabel('iterations(per 300)')
     plt.show()
 
 

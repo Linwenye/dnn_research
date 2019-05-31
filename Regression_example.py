@@ -12,7 +12,7 @@ np.random.shuffle(X)  # randomize the data
 
 Y = 2 * (X ** 2) + 1.5 + np.random.rand(size_total) * 3
 
-dtype = "float"
+dtype = "mpmath"
 precision = 53
 
 if dtype == "decimal":
@@ -36,8 +36,9 @@ Y_test = Y_test.reshape(1, size_test)
 layers_dims = [1, 5, 5, 3, 1]  # 3-layer model
 activation_list = ["relu", "relu", "relu", "linear"]
 
-print_ctrl = {"print_cost": False, "print_parameter": True, "iterations": 300}
-parameters = L_layer_model(X_train, Y_train, layers_dims, activation_list=activation_list, num_iterations=4500,
+print_ctrl = {"print_cost": True, "print_parameter": False, "iterations": 300}
+parameters = L_layer_model(X_train, Y_train, layers_dims, learning_rate=0.01, activation_list=activation_list,
+                           num_iterations=1500,
                            print_ctrl=print_ctrl, cost_type="MSE", dtype=dtype, precision=precision)
 pred_train = predict(X_train, Y_train, parameters, activation_list=activation_list, not_convert=True)
 pred_of_test = predict(X_test, Y_test, parameters, activation_list=activation_list, not_convert=True)

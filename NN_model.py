@@ -8,6 +8,7 @@ from PIL import Image
 from scipy import ndimage
 from numpy_decimal import *
 from pprint import pprint
+from record import *
 
 plt.rcParams['figure.figsize'] = (5.0, 4.0)  # set default size of plots
 plt.rcParams['image.interpolation'] = 'nearest'
@@ -129,7 +130,7 @@ def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_
     parameters = initialize_parameters_deep(layers_dims, dtype)
 
     # Loop (gradient descent)
-    for i in range(0, num_iterations):
+    for i in range(0, num_iterations + 1):
 
         # Forward propagation: [LINEAR -> RELU]*(L-1) -> LINEAR -> SIGMOID.
         AL, caches = L_model_forward(X, parameters, activation_list=activation_list)
@@ -148,6 +149,7 @@ def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_
         if print_ctrl["print_cost"] and i % print_ctrl["iterations"] == 0:
             print("Cost after iteration %i: %f" % (i, cost))
             costs.append(cost)
+            record_time()
 
         if print_ctrl["print_parameter"] and i % print_ctrl["iterations"] == 0:
             print("Iterations ", i)
@@ -159,5 +161,4 @@ def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_
     # plt.xlabel('iterations (per tens)')
     # plt.title("Learning rate =" + str(learning_rate))
     # plt.show()
-
     return parameters
