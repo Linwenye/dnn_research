@@ -88,10 +88,10 @@ def initialize_parameters_deep(layer_dims, dtype):
             assert (parameters['b' + str(l)].shape == (layer_dims[l], 1))
     else:
         for l in range(1, L):
-            parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l - 1]) / np.sqrt(
-                layer_dims[l - 1])  # *0.01
+            parameters['W' + str(l)] = (np.random.randn(layer_dims[l], layer_dims[l - 1]) / np.sqrt(
+                layer_dims[l - 1])).astype(dtype)  # *0.01
 
-            parameters['b' + str(l)] = np.zeros((layer_dims[l], 1))
+            parameters['b' + str(l)] = (np.zeros((layer_dims[l], 1))).astype(dtype)
             assert (parameters['W' + str(l)].shape == (layer_dims[l], layer_dims[l - 1]))
             assert (parameters['b' + str(l)].shape == (layer_dims[l], 1))
     return parameters
@@ -220,7 +220,7 @@ def L_model_forward(X, parameters, activation_list):
 # print("Length of caches list = " + str(len(caches)))
 
 
-def compute_cost(AL, Y, cost_type="cross-entropy"):
+def compute_cost(AL, Y, dtype, cost_type="cross-entropy"):
     """
     Implement the cost function defined by equation).
 
@@ -237,7 +237,11 @@ def compute_cost(AL, Y, cost_type="cross-entropy"):
     # Compute loss from aL and y.
     # log use e as base
     if (cost_type == "cross-entropy"):
-        cost = (-1 / m) * np.sum(np.multiply(Y, np.log(AL)) + np.multiply(1 - Y, np.log(1 - AL)))
+        if dtype == "decimal":
+            cost = np.sum(np.multiply(Y, decimal_log(AL)) + np.multiply(1 - Y, decimal_log(1 - AL)))
+            cost = -cost / m
+        else:
+            cost = (-1 / m) * np.sum(np.multiply(Y, np.log(AL)) + np.multiply(1 - Y, np.log(1 - AL)))
     elif (cost_type == "MAE"):
         cost = np.sum(np.abs(AL - Y)) / m
     elif (cost_type == "MSE"):

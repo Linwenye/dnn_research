@@ -125,7 +125,6 @@ def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_
         learning_rate = Decimal(learning_rate)
     elif dtype == "mpmath":
         set_mp_precision(precision)
-
     # Parameters initialization.
     parameters = initialize_parameters_deep(layers_dims, dtype)
 
@@ -136,7 +135,7 @@ def L_layer_model(X, Y, layers_dims, activation_list, learning_rate=0.0075, num_
         AL, caches = L_model_forward(X, parameters, activation_list=activation_list)
 
         # Compute cost.
-        cost = compute_cost(AL, Y, cost_type)
+        cost = compute_cost(AL, Y, dtype, cost_type)
 
         # Backward propagation.
         grads = L_model_backward(AL, Y, caches, activation_list=activation_list, cost_type=cost_type, dtype=dtype)

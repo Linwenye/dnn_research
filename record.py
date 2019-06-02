@@ -6,7 +6,9 @@ start = time.time()
 
 
 def record_time():
-    time_records.append(time.time() - start)
+    time_elapse = time.time() - start
+    print(time_elapse)
+    time_records.append(time_elapse)
 
 
 def plot_time():
